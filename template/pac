@@ -27,6 +27,7 @@ var domains = {
   "nicovideo.jp": 1,
   "nyaa.si": 1,
   "nytimes.com": 1,
+  "pbs.twimg.com": 1,
   "phncdn.com": 1,
   "pinterest.com": 1,
   "pixiv.net": 1,
