@@ -50,6 +50,7 @@ var domains = {
 };
 
 var shexps = {
+  "*://*.dlsite.com/*": 1,
   "*://*.steampowered.com/*": 1,
   "*://steamcommunity-a.akamaihd.net/*": 1,
   "*://steamuserimages-a.akamaihd.net/*": 1,
