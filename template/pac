@@ -53,6 +53,7 @@ var shexps = {
   "*://*.dlsite.com/*": 1,
   "*://*.dlsite.jp/*": 1,
   "*://*.steampowered.com/*": 1,
+  "*://steam*.akamaihd.net/*": 1,
   "*://steamcommunity-a.akamaihd.net/*": 1,
   "*://steamuserimages-a.akamaihd.net/*": 1,
   "*://*.amazon.co.jp/*": 1,
