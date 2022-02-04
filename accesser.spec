@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['accesser.py'],
-             pathex=['E:/Yuxin/Accesser'],
+             pathex=['D:/Yueyu/Accesser'],
              binaries=[],
              datas=[('config.json.default', '.'),
                     ('template/pac', 'template'),
@@ -15,7 +15,7 @@ a = Analysis(['accesser.py'],
                     ('dnscrypt/dnscrypt-proxy.exe', 'dnscrypt'),
                     ('dnscrypt/dnscrypt-proxy.toml', 'dnscrypt'),
                     ('dnscrypt/cloaking-rules.txt', 'dnscrypt'),
-                    ('C:/Users/Yuxin/AppData/Local/Programs/Python/Python39/Lib/site-packages/tld/res/effective_tld_names.dat.txt', 'tld/res')],
+                    ('C:/Users/Yueyu/AppData/Local/Programs/Python/Python39/Lib/site-packages/tld/res/effective_tld_names.dat.txt', 'tld/res')],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],

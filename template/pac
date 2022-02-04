@@ -17,11 +17,15 @@ var domains = {
   "euronews.com": 1,
   "exhentai.org": 1,
   "ftchinese.com": 1,
+  "gelbooru.com": 1,
   "github.com": 1,
   "imgur.com": 1,
   "instagram.com": 1,
+  "iqdb.org": 1,
   "i.pximg.net": 1,
   "kobo.com": 1,
+  "konachan.com": 1,
+  "konachan.net": 1,
   "medium.com": 1,
   "mega.nz": 1,
   "nicovideo.jp": 1,
@@ -37,10 +41,13 @@ var domains = {
   "reddit.com": 1,
   "redditmedia.com": 1,
   "redditstatic.com":1,
+  "safebooru.org":1,
+  "saucenao.com":1,
   "startpage.com": 1,
   "steamcommunity.com": 1,
   "theepochtimes.com": 1,
   "thetvdb.com": 1,
+  "tineye.com": 1,
   "tumblr.com": 1,
   "tumblr.co": 1,
   "uptodown.com": 1,
@@ -50,6 +57,7 @@ var domains = {
 };
 
 var shexps = {
+  "*://*anime-pictures.net/*": 1,
   "*://*.dlsite.com/*": 1,
   "*://*.dlsite.jp/*": 1,
   "*://*.steampowered.com/*": 1,
@@ -62,7 +70,8 @@ var shexps = {
   "*://*.clipconverter.cc/*": 1,
   "*://*.japantimes.co.jp/*": 1,
   "*://*.yahoo.co.jp/*": 1,
-  "*://*.cna.com.tw/*": 1
+  "*://*.cna.com.tw/*": 1,
+  "*://*.sankakucomplex.com/*": 1
 };
 
 var proxy = "PROXY 127.0.0.1:{{port}};";
