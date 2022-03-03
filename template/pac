@@ -20,6 +20,7 @@ var domains = {
   "ftchinese.com": 1,
   "gelbooru.com": 1,
   "github.com": 1,
+  "imgix.net": 1,
   "imgur.com": 1,
   "instagram.com": 1,
   "iqdb.org": 1,
