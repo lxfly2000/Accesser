@@ -17,6 +17,8 @@ var domains = {
   "epochtimes.com": 1,
   "euronews.com": 1,
   "exhentai.org": 1,
+  "fastpic.org": 1,
+  "fastpic.ru": 1,
   "ftchinese.com": 1,
   "gelbooru.com": 1,
   "github.com": 1,
