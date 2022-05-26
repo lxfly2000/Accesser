@@ -63,7 +63,7 @@ var domains = {
 };
 
 var shexps = {
-  "*://*anime-pictures.net/*": 1,
+  "*://anime-pictures.net/*": 1,
   "*://*.dlsite.com/*": 1,
   "*://*.dlsite.jp/*": 1,
   "*://*.steampowered.com/*": 1,
