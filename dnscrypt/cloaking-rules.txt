@@ -1,3 +1,20 @@
+# The cloaking-rules is just a HOST file used by dnscrypt only.
+
+community.akamai.steamstatic.com 23.220.167.91
+community.akamai.steamstatic.com 23.62.106.32
+community.akamai.steamstatic.com 23.62.106.58
+community.akamai.steamstatic.com 23.61.246.75
+community.akamai.steamstatic.com 23.61.246.99
+community.akamai.steamstatic.com 104.73.172.115
+clientconfig.akamai.steamstatic.com 23.59.155.11
+clientconfig.akamai.steamstatic.com 23.59.155.16
+clientconfig.akamai.steamstatic.com 23.55.179.200
+clientconfig.akamai.steamstatic.com 23.55.179.212
+steamuserimages-a.akamaihd.net 23.220.167.90
+steamuserimages-a.akamaihd.net 23.220.167.96
+steamuserimages-a.akamaihd.net 58.97.45.160
+steamuserimages-a.akamaihd.net 58.97.45.225
+
 .pixiv.net 210.140.131.219
 www.bbc.co.uk 212.58.233.252
 
