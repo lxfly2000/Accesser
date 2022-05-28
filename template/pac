@@ -27,6 +27,7 @@ var domains = {
   "instagram.com": 1,
   "iqdb.org": 1,
   "i.pximg.net": 1,
+  "jsdelivr.net": 1,
   "kobo.com": 1,
   "konachan.com": 1,
   "konachan.net": 1,
