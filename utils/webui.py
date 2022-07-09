@@ -73,7 +73,7 @@ class PACHandler(tornado.web.RequestHandler):
             with open('pac') as f:
                 self.write(f.read())
             return
-        self.render('pac', port=setting.config['server']['port'])
+        self.render('pac',host=setting.config['server']['host'], port=setting.config['server']['port'])
 
 class CRTHandler(tornado.web.StaticFileHandler):
     def set_headers(self):

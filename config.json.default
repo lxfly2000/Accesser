@@ -5,7 +5,8 @@
   },
   "server": {
     "address": "127.0.0.1",
-	"port": 7655
+    "host":"localhost",
+    "port": 7655
   },
   "check_hostname": true,
   "DNS": {
