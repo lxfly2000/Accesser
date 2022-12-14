@@ -1,4 +1,5 @@
 var domains = {
+  "ameba.jp": 1,
   "apkmirror.com": 1,
   "appledaily.com": 1,
   "archiveofourown.org": 1,
