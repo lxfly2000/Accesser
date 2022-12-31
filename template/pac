@@ -33,7 +33,7 @@ var domains = {
   //"jsdelivr.net": 1,
   "kobo.com": 1,
   "konachan.com": 1,
-  "konachan.net": 1,
+  //"konachan.net": 1,
   "lolibooru.moe": 1,
   "medium.com": 1,
   "mega.nz": 1,
