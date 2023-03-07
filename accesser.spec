@@ -1,21 +1,15 @@
 # -*- mode: python -*-
+import os, tld
 
 block_cipher = None
 
 
-a = Analysis(['accesser.py'],
-             pathex=['D:/Yueyu/Accesser'],
+a = Analysis(['accesser/__main__.py'],
+             pathex=['./'],
              binaries=[],
-             datas=[('config.json.default', '.'),
-                    ('template/pac', 'template'),
-                    ('sysproxy.exe', '.'),
-                    ('template/index.html', 'template'),
-                    ('static/main.js', 'static'),
-                    ('static/style.css', 'static'),
-                    ('dnscrypt/dnscrypt-proxy.exe', 'dnscrypt'),
-                    ('dnscrypt/dnscrypt-proxy.toml', 'dnscrypt'),
-                    ('dnscrypt/cloaking-rules.txt', 'dnscrypt'),
-                    ('C:/Users/Yueyu/AppData/Local/Programs/Python/Python39/Lib/site-packages/tld/res/effective_tld_names.dat.txt', 'tld/res')],
+             datas=[('accesser/config.toml', 'accesser'),
+                    ('accesser/pac', 'accesser'),
+                    (os.path.dirname(tld.__file__)+'/res/effective_tld_names.dat.txt', 'tld/res')],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
@@ -38,4 +32,4 @@ exe = EXE(pyz,
           strip=False,
           upx=True,
           runtime_tmpdir=None,
-          console=False )
+          console=True )
