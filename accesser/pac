@@ -70,7 +70,7 @@ var domains = {
 
 var shexps = {
   "*://anime-pictures.net/*": 1,
-  "*://api.openai.com/*": 1,
+  "*://*.openai.com/*": 1,
   "*://*.dlsite.com/*": 1,
   "*://*.dlsite.jp/*": 1,
   "*://*.steampowered.com/*": 1,
@@ -87,7 +87,7 @@ var shexps = {
   "*://*.sankakucomplex.com/*": 1
 };
 
-var proxy = "PROXY {{host}}:{{port}};";
+var proxy = "PROXY 127.0.0.1:{{port}};";
 
 var direct = 'DIRECT;';
 

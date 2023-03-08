@@ -33,7 +33,7 @@ logfile = ""
 
 # 服务器绑定的地址。设为 "0.0.0.0" 可以允许同一局域网的设备连接该程序，比如用手机连接电脑的WiFi，设置PAC后既可允许手机使用。可能会有防火墙的提示，要允许访问。
 # The address to which the server is bound. Set to "0.0.0.0" to allow devices on the same LAN to connect to the program, such as using your phone to connect to your computer's WiFi, after setting the PAC to allow both your phone to use it. There may be a firewall prompt to allow access.
-address = "127.0.0.1"
+address = "0.0.0.0"
 
 # 服务器的端口号，如果与其他程序发生端口冲突时可以更改，其值应为1-65535，建议>1024。
 # The port number of the server, which can be changed in case of port conflicts with other programs, should have a value of 1-65535, with >1024 recommended.
