@@ -54,11 +54,12 @@ async def update_cert(server_name):
 
 async def send_pac(writer: asyncio.StreamWriter):
     with open('pac' if os.path.exists('pac') else os.path.join(basepath, 'pac'), 'rb') as f:
-        pac = f.read().replace(b'{{port}}', str(setting.config['server']['port']).encode('iso-8859-1'))
+        pac = f.read().replace(b'{{port}}', str(setting.config['server']['port']).encode('iso-8859-1')).replace(b'{{host}}', setting.config['server'].get('pac_host', '127.0.0.1').encode('iso-8859-1'))
     writer.write(f'HTTP/1.1 200 OK\r\nContent-Type: application/x-ns-proxy-autoconfig\r\nContent-Length: {len(pac)}\r\n\r\n'.encode('iso-8859-1'))
     writer.write(pac)
     await writer.drain()
     writer.close()
+    await writer.wait_closed()
 
 async def send_crt(writer: asyncio.StreamWriter, path: str):
     with open(os.path.join(basepath, path.lstrip('/')), 'rb') as f:
@@ -67,6 +68,7 @@ async def send_crt(writer: asyncio.StreamWriter, path: str):
     writer.write(crt)
     await writer.drain()
     writer.close()
+    await writer.wait_closed()
     
 async def http_redirect(writer: asyncio.StreamWriter, path: str):
     path = path.removeprefix('http://')
@@ -78,6 +80,7 @@ async def http_redirect(writer: asyncio.StreamWriter, path: str):
     writer.write(f'HTTP/1.1 301 Moved Permanently\r\nLocation: https://{path}\r\n\r\n'.encode('iso-8859-1'))
     await writer.drain()
     writer.close()
+    await writer.wait_closed()
 
 async def forward_stream(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
     while True:
@@ -115,7 +118,10 @@ async def handle(reader, writer):
         writer.write(b'HTTP/1.1 200 Connection Established\r\n\r\n')
 
         await update_cert(host)
-        await writer.start_tls(context)
+        if sys.version_info[1] >= 11:
+            await writer.start_tls(context)
+        else:
+            writer._transport = await writer._loop.start_tls(writer.transport, writer._protocol, context, server_side=True)
         server_hostname = setting.config['alter_hostname'].get(host, '')
         logger.debug(f'[{i_port:5}] {server_hostname=}')
         remote_context = ssl.create_default_context()
@@ -134,6 +140,10 @@ async def handle(reader, writer):
             forward_stream(reader, remote_writer),
             forward_stream(remote_reader, writer)
         )
+    writer.close()
+    remote_writer.close()
+    await remote_writer.wait_closed()
+    await writer.wait_closed()
 
 async def proxy():
     server = await asyncio.start_server(handle, setting.config['server']['address'], setting.config['server']['port'])
@@ -180,22 +190,22 @@ async def main():
     global context, cert_store, cert_lock, DNSresolver
     print(f"Accesser v{__version__}  Copyright (C) 2018-2023  URenko")
     setting.parse_args()
+        
+    DNSresolver = dns.asyncresolver.Resolver(configure=False)
+    DNSresolver.cache = dns.resolver.LRUCache()
+    DNSresolver.nameservers = setting.config['DNS']['nameserver']
+    DNSresolver.port = int(setting.config['DNS']['port'])
     
-    async with asyncio.TaskGroup() as tg:
-        tg.create_task(asyncio.to_thread(update_checker))
-        
-        DNSresolver = dns.asyncresolver.Resolver(configure=False)
-        DNSresolver.cache = dns.resolver.LRUCache()
-        DNSresolver.nameservers = setting.config['DNS']['nameserver']
-        DNSresolver.port = int(setting.config['DNS']['port'])
-        
-        importca.import_ca()
+    importca.import_ca()
 
-        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-        cert_store = set()
-        cert_lock = asyncio.Lock()
-        
-        tg.create_task(proxy())
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    cert_store = set()
+    cert_lock = asyncio.Lock()
+    
+    await asyncio.gather(
+        asyncio.to_thread(update_checker),
+        proxy()
+    )
 
 def run():
     asyncio.run(main())
