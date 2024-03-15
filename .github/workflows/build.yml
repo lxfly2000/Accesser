@@ -3,47 +3,54 @@ name: Auto build for windows
 on:
   push:
     branches: [ '*' ]
+    tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ '*' ]
 
 jobs:
-  pyinstaller:
+  windows:
     runs-on: windows-2022
     steps:
     - name: Setup python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
-          python-version: '3.11'
+          python-version: '3.12'
           architecture: x64
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
-        pip install pyinstaller httpx[http2]
+        pip install pyinstaller dnspython[doh,doq] rich
         pip install -r requirements.txt
     - name: Package Application
       run: |
         pyinstaller accesser.spec
       env:
         PYTHONOPTIMIZE: 1
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
+        name: windows
         path: ./dist/
   
-  package:
-    runs-on: ubuntu-latest
+  windows-lite:
+    runs-on: windows-2022
     steps:
     - name: Setup python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
-          python-version: '3.11'
+          python-version: '3.12'
           architecture: x64
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
-        pip install --upgrade build
+        pip install pyinstaller
+        pip install -r requirements.txt
     - name: Package Application
       run: |
-        python3 -m build
-    - uses: actions/upload-artifact@v3
+        sed -i 's/^ \+\"https/# \"https/' accesser/config.toml
+        pyinstaller accesser.spec
+      env:
+        PYTHONOPTIMIZE: 1
+    - uses: actions/upload-artifact@v4
       with:
+        name: windows-lite
         path: ./dist/

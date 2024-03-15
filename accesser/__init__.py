@@ -16,19 +16,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__version__ = '0.8.1'
+__version__ = '0.9.2'
 
 import os, sys
 import json
+import fnmatch
 import random
 import ssl
 import asyncio
 import traceback
 from contextlib import closing
 from urllib import request
-from pkg_resources import parse_version
-from tld import get_tld
-import dns, dns.asyncresolver
+from urllib.parse import urlsplit
+from packaging.version import Version
+from tld import get_tld, is_tld
+import dns, dns.asyncresolver, dns.nameserver
 
 from .utils import certmanager as cm
 from .utils import importca
@@ -41,11 +43,12 @@ from .utils import sysproxy
 
 async def update_cert(server_name):
     global context, cert_store, cert_lock
-    res = get_tld(server_name, as_object=True, fix_protocol=True)
-    if res.subdomain:
-        server_name = res.subdomain.split('.', 1)[-1] + '.' + res.domain + '.' + res.tld
-    else:
-        server_name = res.domain + '.' + res.tld
+    if not is_tld(server_name):
+        res = get_tld(server_name, as_object=True, fix_protocol=True)
+        if res.subdomain:
+            server_name = res.subdomain.split('.', 1)[-1] + '.' + res.domain + '.' + res.tld
+        else:
+            server_name = res.domain + '.' + res.tld
     async with cert_lock:
         if not server_name in cert_store:
             cm.create_certificate(server_name)
@@ -95,7 +98,7 @@ async def handle(reader, writer):
     with closing(writer):
         raw_request = await reader.readuntil(b'\r\n\r\n')
         requestline = raw_request.decode('iso-8859-1').splitlines()[0]
-        i_addr, i_port = writer.get_extra_info('peername')
+        i_addr, i_port, *_ = writer.get_extra_info('peername')
         logger.debug(f"{i_addr}:{i_port} say: {requestline}")
         words = requestline.split()
         command, path = words[:2]
@@ -122,20 +125,31 @@ async def handle(reader, writer):
             await writer.start_tls(context)
         else:
             writer._transport = await writer._loop.start_tls(writer.transport, writer._protocol, context, server_side=True)
-        server_hostname = setting.config['alter_hostname'].get(host, '')
+        server_hostname_key = next(filter(lambda h:fnmatch.fnmatchcase(host, h), setting.config['alter_hostname']), None)
+        server_hostname = '' if server_hostname_key is None else setting.config['alter_hostname'][server_hostname_key]
         logger.debug(f'[{i_port:5}] {server_hostname=}')
         remote_context = ssl.create_default_context()
         remote_context.check_hostname = False
         remote_reader, remote_writer = await asyncio.open_connection(remote_ip, port, ssl=remote_context, server_hostname=server_hostname)
         cert = remote_writer.get_extra_info('peercert')
-        logger.debug(f"[{i_port:5}] {cert.get('subjectAltName', ())=}")
-        if setting.config['check_hostname'] is not False:
+        cert_message = f"subjectAltName: {cert.get('subjectAltName', ())}, subject: {cert.get('subject', ())}"
+        logger.debug(f"[{i_port:5}] {cert_message}.")
+        cert_verify_key = next(filter(lambda h:fnmatch.fnmatchcase(host, h), setting.config.get('cert_verify', ())), None)
+        if cert_verify_key is not None:
+            cert_verify_list = setting.config['cert_verify'][cert_verify_key]
+            cert_policy = False if cert_verify_list is False else True
+        elif server_hostname_key is not None:
+            cert_verify_list = [setting.config['alter_hostname'][server_hostname_key]]
+            cert_policy = setting.config['check_hostname']
+        else:
+            cert_verify_list = [host]
+            cert_policy = setting.config['check_hostname']
+        if not cert_policy is False:
             try:
-                match_hostname(cert, setting.config['alter_hostname'].get(host, host))
-            except ssl.CertificateError as err:
-                logger.warning(f'[{i_port:5}] {err}')
+                next(filter(lambda h:match_hostname(cert, h, cert_policy), cert_verify_list))
+            except StopIteration:
+                logger.warning(f"[{i_port:5}] {cert_verify_list} don't march either of {cert_message}.")
                 return
-        
         await asyncio.gather(
             forward_stream(reader, remote_writer),
             forward_stream(remote_reader, writer)
@@ -157,11 +171,13 @@ async def proxy():
     finally:
         sysproxy.set_pac(None)
 
-async def DNSquery(domain):
+async def DNSquery(domain, hosts_only=False):
     global DNSresolver
     try:
         return next(v for k,v in setting.config['hosts'].items() if k==domain or (k.startswith('.') and domain.endswith(k)))
-    except StopIteration: pass
+    except StopIteration:
+        if hosts_only:
+            return
     if setting.config['ipv6']:
         try:
             ret = await DNSresolver.resolve(domain, 'AAAA')
@@ -175,26 +191,36 @@ def update_checker():
     for pypi_url in ['https://pypi.org/pypi/accesser/json', 'https://mirrors.cloud.tencent.com/pypi/json/accesser']:
         try:
             with request.urlopen(pypi_url) as f:
-                v2 = parse_version(json.load(f)["info"]["version"])
+                v2 = Version(json.load(f)["info"]["version"])
                 break
         except Exception:
             logger.warning(traceback.format_exc())
     else:
         with request.urlopen('https://github.com/URenko/Accesser/releases/latest') as f:
-            v2 = parse_version(f.geturl().rsplit('/', maxsplit=1)[-1])
-    v1 = parse_version(__version__)
+            v2 = Version(f.geturl().rsplit('/', maxsplit=1)[-1])
+    v1 = Version(__version__)
     if v2 > v1:
         logger.warning("There is a new version, you can update with 'python3 -m pip install -U accesser' or download from GitHub")
 
 async def main():
     global context, cert_store, cert_lock, DNSresolver
-    print(f"Accesser v{__version__}  Copyright (C) 2018-2023  URenko")
+    print(f"Accesser v{__version__}  Copyright (C) 2018-2024  URenko")
     setting.parse_args()
         
     DNSresolver = dns.asyncresolver.Resolver(configure=False)
     DNSresolver.cache = dns.resolver.LRUCache()
-    DNSresolver.nameservers = setting.config['DNS']['nameserver']
-    DNSresolver.port = int(setting.config['DNS']['port'])
+    for nameserver in setting.config['DNS']['nameserver']:
+        if (_url := urlsplit(nameserver)).netloc == '':
+            _url = urlsplit('//' + nameserver)
+        address = await DNSquery(_url.hostname, hosts_only=True)
+        if _url.scheme == '':
+            DNSresolver.nameservers.append(dns.nameserver.Do53Nameserver(_url.hostname if address is None else address, 53 if _url.port is None else _url.port))
+        elif _url.scheme == 'https':
+            DNSresolver.nameservers.append(dns.nameserver.DoHNameserver(nameserver, bootstrap_address=address))
+        elif _url.scheme == 'tls':
+            DNSresolver.nameservers.append(dns.nameserver.DoTNameserver(_url.hostname if address is None else address, 853 if _url.port is None else _url.port, hostname=_url.hostname))
+        elif _url.scheme == 'quic':
+            DNSresolver.nameservers.append(dns.nameserver.DoQNameserver(_url.hostname if address is None else address, 853 if _url.port is None else _url.port, server_hostname=_url.hostname))
     
     importca.import_ca()
 
