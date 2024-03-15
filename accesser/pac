@@ -93,9 +93,8 @@ var shexps = {
   "*://*.japantimes.co.jp/*": 1,
   "*://*.yahoo.co.jp/*": 1,
   "*://*.cna.com.tw/*": 1,
-  "*://*.sankakucomplex.com/*": 1
+  "*://*.sankakucomplex.com/*": 1,
   "*://search.yahoo.co.jp/*": 1,
-  "*://*.cna.com.tw/*": 1,
   "*://media.discordapp.net/*": 1,
   "*://*.dmc.nico/*": 1,
   "*://*.pixivsketch.net/*": 1,
@@ -111,7 +110,7 @@ var direct = 'DIRECT;';
 var hasOwnProperty = Object.hasOwnProperty;
 
 function shExpMatchs(str, shexps) {
-    for (shexp in shexps) {
+    for (var shexp in shexps) {
         if (shExpMatch(str, shexp)) {
             return true;
         }
