@@ -43,6 +43,7 @@ var domains = {
   "nyt.com": 1,
   "phncdn.com": 1,
   "pinterest.com": 1,
+  "i.pinimg.com": 1,
   "pixiv.net": 1,
   "quora.com": 1,
   "redd.it": 1,
@@ -61,8 +62,18 @@ var domains = {
   "vimeo.com": 1,
   "wenxuecity.com": 1,
   "wikipedia.org": 1,
+  "wikimedia.org": 1,
+  "mediawiki.org": 1,
+  "wikiquote.org": 1,
+  "wikinews.org": 1,
+  "wikiversity.org": 1,
+  "wiktionary.org": 1,
+  "wikibooks.org": 1,
+  "wikivoyage.org": 1,
+  "wikisource.org": 1,
+  "wikidata.org": 1,
   "singlelogin.re": 1,
-  "singlelogin.se": 1,
+  "1lib.sk": 1,
   "archive.org": 1,
   "amazon.co.jp": 1,
   "discord.com": 1,
@@ -73,7 +84,8 @@ var domains = {
   "twitch.tv": 1,
   "scratch.mit.edu": 1,
   "bandcamp.com": 1,
-  "mastodon.social": 1
+  "mastodon.social": 1,
+  "hub.docker.com": 1
 };
 
 var shexps = {
@@ -96,7 +108,7 @@ var shexps = {
   "*://*.sankakucomplex.com/*": 1,
   "*://search.yahoo.co.jp/*": 1,
   "*://media.discordapp.net/*": 1,
-  "*://*.dmc.nico/*": 1,
+  "*://i.pximg.net/*": 1,
   "*://*.pixivsketch.net/*": 1,
   "*://*.githubassets.com/*": 1,
   "*://*.githubusercontent.com/*": 1,
