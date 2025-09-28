@@ -27,6 +27,7 @@ var domains = {
   "greasyfork.org": 1,
   "imgur.com": 1,
   "instagram.com": 1,
+  "itch.io": 1,
   "iqdb.org": 1,
   "i.pximg.net": 1,
   //"jsdelivr.net": 1,
